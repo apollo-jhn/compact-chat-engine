@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from unittest.mock import MagicMock
+
 import pytest
+
 from compact_chat_engine.config import ChatConfig
 from compact_chat_engine.storage import SqliteSessionStorage
 

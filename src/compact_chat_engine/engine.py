@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import sys
-from typing import Iterator, Optional
+from collections.abc import Iterator
+
 from openai import OpenAI
 
 from .config import ChatConfig
@@ -29,10 +29,10 @@ class ChatSession:
     def __init__(
         self,
         session_id: str = "default",
-        config: Optional[ChatConfig] = None,
-        storage: Optional[SqliteSessionStorage] = None,
-        tokenizer: Optional[TokenizerManager] = None,
-        client: Optional[OpenAI] = None,
+        config: ChatConfig | None = None,
+        storage: SqliteSessionStorage | None = None,
+        tokenizer: TokenizerManager | None = None,
+        client: OpenAI | None = None,
     ):
         self.session_id = session_id
         self.config = config or ChatConfig.from_env()
@@ -88,9 +88,7 @@ class ChatSession:
 
     def merge_to_scratchpad(self, evicted_turns: list[Message]) -> str:
         """Synthesizes evicted turns into the structured markdown scratchpad."""
-        transcript_lines = [
-            f"{msg.role.upper()}: {msg.content}" for msg in evicted_turns
-        ]
+        transcript_lines = [f"{msg.role.upper()}: {msg.content}" for msg in evicted_turns]
         transcript_text = "\n\n".join(transcript_lines)
 
         merge_messages = [
@@ -130,7 +128,7 @@ class ChatSession:
         self.save_session()
         return new_scratchpad
 
-    def compact_context_if_needed(self) -> Optional[str]:
+    def compact_context_if_needed(self) -> str | None:
         """Monitors token usage and compacts historical turns when crossing the limit."""
         active_messages = self.get_active_payload()
         current_tokens = self.tokenizer.count_messages(active_messages)
@@ -222,11 +220,9 @@ class ChatSession:
             prompt_tokens = self.tokenizer.count_messages(active_payload)
             comp_tokens = self.tokenizer.count_text(assistant_response)
 
-        yield UsageReportEvent(
-            prompt_tokens=prompt_tokens, completion_tokens=comp_tokens
-        )
+        yield UsageReportEvent(prompt_tokens=prompt_tokens, completion_tokens=comp_tokens)
 
-    def chat(self, user_input: str) -> Optional[str]:
+    def chat(self, user_input: str) -> str | None:
         """Convenience method that runs stream_chat and returns the full assistant text."""
         chunks = []
         for event in self.stream_chat(user_input):

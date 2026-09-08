@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from unittest.mock import MagicMock
 from compact_chat_engine.engine import ChatSession
 from compact_chat_engine.models import (
     CompactionEndEvent,

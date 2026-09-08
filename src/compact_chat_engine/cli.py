@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import sys
 import time
-from typing import Optional
+from typing import Any
 
 from rich import box
 from rich.console import Console
-from rich.live import Live
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.prompt import Prompt
@@ -263,7 +262,7 @@ def display_archive(console: Console, bot: ChatSession) -> None:
 
 def handle_slash_command(
     cmd_line: str, bot: ChatSession, console: Console
-) -> tuple[bool, Optional[str]]:
+) -> tuple[bool, str | None]:
     """
     Evaluates in-chat slash commands.
     Returns (handled, optional_new_session_id_to_switch).
@@ -324,10 +323,11 @@ SLASH_COMMANDS = [
 ]
 
 
-def create_prompt_session() -> tuple[Optional[Any], Optional[Any]]:
+def create_prompt_session() -> tuple[Any | None, Any | None]:
     """Creates a PromptSession with persistent history and tab completion."""
     try:
         import os
+
         from prompt_toolkit import PromptSession
         from prompt_toolkit.completion import WordCompleter
         from prompt_toolkit.history import FileHistory
@@ -341,8 +341,8 @@ def create_prompt_session() -> tuple[Optional[Any], Optional[Any]]:
 
 def read_user_input(
     console: Console,
-    prompt_session: Optional[Any],
-    completer: Optional[Any],
+    prompt_session: Any | None,
+    completer: Any | None,
 ) -> str:
     """Reads user input via prompt_toolkit when available in an interactive tty, falling back to console.input."""
     if prompt_session is not None and completer is not None and sys.stdin.isatty():
@@ -372,7 +372,7 @@ def stream_turn(bot: ChatSession, user_text: str, console: Console) -> None:
     status.start()
     accumulated_chunks: list[str] = []
     approx_tokens = 0
-    usage_info: Optional[UsageReportEvent] = None
+    usage_info: UsageReportEvent | None = None
     interrupted = False
     has_error = False
 
@@ -431,7 +431,7 @@ def stream_turn(bot: ChatSession, user_text: str, console: Console) -> None:
             console.print()
 
 
-def run_session(session_id: str = "default", console: Optional[Console] = None) -> None:
+def run_session(session_id: str = "default", console: Console | None = None) -> None:
     if console is None:
         console = get_console()
 
@@ -455,7 +455,9 @@ def run_session(session_id: str = "default", console: Optional[Console] = None) 
             if user_text.startswith("/"):
                 handled, new_session = handle_slash_command(user_text, bot, console)
                 if new_session == "__EXIT__":
-                    console.print(f"[bold cyan]Session '{bot.session_id}' stored. Goodbye![/bold cyan]")
+                    console.print(
+                        f"[bold cyan]Session '{bot.session_id}' stored. Goodbye![/bold cyan]"
+                    )
                     break
                 elif new_session:
                     bot.save_session()

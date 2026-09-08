@@ -35,30 +35,35 @@ class SessionState:
 # Streaming Event Types
 class ChatEvent:
     """Base class for all engine streaming events."""
+
     pass
 
 
 @dataclass
 class TextDeltaEvent(ChatEvent):
     """Fired when a token or text chunk is streamed from the model."""
+
     delta: str
 
 
 @dataclass
 class CompactionStartEvent(ChatEvent):
     """Fired when working memory synthesis begins."""
+
     pass
 
 
 @dataclass
 class CompactionEndEvent(ChatEvent):
     """Fired when working memory synthesis finishes."""
+
     scratchpad: str
 
 
 @dataclass
 class UsageReportEvent(ChatEvent):
     """Fired when generation completes, reporting token usage."""
+
     prompt_tokens: int
     completion_tokens: int
 
@@ -66,10 +71,12 @@ class UsageReportEvent(ChatEvent):
 @dataclass
 class InterruptedEvent(ChatEvent):
     """Fired when stream is canceled or interrupted."""
+
     pass
 
 
 @dataclass
 class ErrorEvent(ChatEvent):
     """Fired if an unrecoverable error occurs during streaming."""
+
     error: Exception

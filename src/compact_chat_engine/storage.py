@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 import time
-from typing import Any, Optional
+from typing import Any
 
 from .models import Message, SessionState
 
@@ -72,7 +72,7 @@ class SqliteSessionStorage:
                 return False
 
         try:
-            with open(legacy_file, "r", encoding="utf-8") as f:
+            with open(legacy_file, encoding="utf-8") as f:
                 data = json.load(f)
 
             scratchpad = ""
@@ -85,18 +85,12 @@ class SqliteSessionStorage:
                 if len(turns) <= recent_buffer_count:
                     recent_messages = [Message.from_dict(m) for m in turns]
                 else:
-                    recent_messages = [
-                        Message.from_dict(m) for m in turns[-recent_buffer_count:]
-                    ]
-                    archive = [
-                        Message.from_dict(m) for m in turns[:-recent_buffer_count]
-                    ]
+                    recent_messages = [Message.from_dict(m) for m in turns[-recent_buffer_count:]]
+                    archive = [Message.from_dict(m) for m in turns[:-recent_buffer_count]]
             # Format 2: Dual-layer dict schema
             elif isinstance(data, dict):
                 scratchpad = data.get("scratchpad", "")
-                recent_messages = [
-                    Message.from_dict(m) for m in data.get("recent_messages", [])
-                ]
+                recent_messages = [Message.from_dict(m) for m in data.get("recent_messages", [])]
                 archive = [Message.from_dict(m) for m in data.get("archive", [])]
 
             state = SessionState(
@@ -183,13 +177,9 @@ class SqliteSessionStorage:
 
             params = []
             for msg in state.archive:
-                params.append(
-                    (state.session_id, msg.role, msg.content, 1, msg.created_at)
-                )
+                params.append((state.session_id, msg.role, msg.content, 1, msg.created_at))
             for msg in state.recent_messages:
-                params.append(
-                    (state.session_id, msg.role, msg.content, 0, msg.created_at)
-                )
+                params.append((state.session_id, msg.role, msg.content, 0, msg.created_at))
 
             if params:
                 conn.executemany(
@@ -225,13 +215,15 @@ class SqliteSessionStorage:
             results: list[dict[str, Any]] = []
             for r in rows:
                 scratchpad_val = r["scratchpad"] or ""
-                results.append({
-                    "session_id": r["session_id"],
-                    "has_scratchpad": bool(scratchpad_val.strip()),
-                    "updated_at": r["updated_at"],
-                    "active_count": r["active_count"] or 0,
-                    "archived_count": r["archived_count"] or 0,
-                })
+                results.append(
+                    {
+                        "session_id": r["session_id"],
+                        "has_scratchpad": bool(scratchpad_val.strip()),
+                        "updated_at": r["updated_at"],
+                        "active_count": r["active_count"] or 0,
+                        "archived_count": r["archived_count"] or 0,
+                    }
+                )
             return results
 
     def delete_session(self, session_id: str) -> None:

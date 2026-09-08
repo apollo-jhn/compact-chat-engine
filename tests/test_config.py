@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from compact_chat_engine.config import ChatConfig
 
 

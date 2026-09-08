@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from unittest.mock import MagicMock
+
 import pytest
 from rich.console import Console
 
@@ -184,11 +185,13 @@ def test_handle_slash_commands(test_console, mock_storage, mock_tokenizer):
 
 def test_stream_turn_success(test_console, mock_storage, mock_tokenizer):
     bot = ChatSession(session_id="stream-session", storage=mock_storage, tokenizer=mock_tokenizer)
-    bot.stream_chat = MagicMock(return_value=[
-        TextDeltaEvent(delta="Hello "),
-        TextDeltaEvent(delta="**world**!"),
-        UsageReportEvent(prompt_tokens=15, completion_tokens=5),
-    ])
+    bot.stream_chat = MagicMock(
+        return_value=[
+            TextDeltaEvent(delta="Hello "),
+            TextDeltaEvent(delta="**world**!"),
+            UsageReportEvent(prompt_tokens=15, completion_tokens=5),
+        ]
+    )
 
     stream_turn(bot, "hi", test_console)
     output = test_console.export_text()
@@ -198,13 +201,17 @@ def test_stream_turn_success(test_console, mock_storage, mock_tokenizer):
 
 
 def test_stream_turn_with_compaction(test_console, mock_storage, mock_tokenizer):
-    bot = ChatSession(session_id="compaction-session", storage=mock_storage, tokenizer=mock_tokenizer)
-    bot.stream_chat = MagicMock(return_value=[
-        CompactionStartEvent(),
-        CompactionEndEvent(scratchpad="## Updated Facts"),
-        TextDeltaEvent(delta="Post compaction response"),
-        UsageReportEvent(prompt_tokens=100, completion_tokens=10),
-    ])
+    bot = ChatSession(
+        session_id="compaction-session", storage=mock_storage, tokenizer=mock_tokenizer
+    )
+    bot.stream_chat = MagicMock(
+        return_value=[
+            CompactionStartEvent(),
+            CompactionEndEvent(scratchpad="## Updated Facts"),
+            TextDeltaEvent(delta="Post compaction response"),
+            UsageReportEvent(prompt_tokens=100, completion_tokens=10),
+        ]
+    )
 
     stream_turn(bot, "hi", test_console)
     output = test_console.export_text()
@@ -213,11 +220,15 @@ def test_stream_turn_with_compaction(test_console, mock_storage, mock_tokenizer)
 
 
 def test_stream_turn_interrupted(test_console, mock_storage, mock_tokenizer):
-    bot = ChatSession(session_id="interrupt-session", storage=mock_storage, tokenizer=mock_tokenizer)
-    bot.stream_chat = MagicMock(return_value=[
-        TextDeltaEvent(delta="Partial"),
-        InterruptedEvent(),
-    ])
+    bot = ChatSession(
+        session_id="interrupt-session", storage=mock_storage, tokenizer=mock_tokenizer
+    )
+    bot.stream_chat = MagicMock(
+        return_value=[
+            TextDeltaEvent(delta="Partial"),
+            InterruptedEvent(),
+        ]
+    )
 
     stream_turn(bot, "hi", test_console)
     output = test_console.export_text()
@@ -226,9 +237,11 @@ def test_stream_turn_interrupted(test_console, mock_storage, mock_tokenizer):
 
 def test_stream_turn_error(test_console, mock_storage, mock_tokenizer):
     bot = ChatSession(session_id="error-session", storage=mock_storage, tokenizer=mock_tokenizer)
-    bot.stream_chat = MagicMock(return_value=[
-        ErrorEvent(error=RuntimeError("Connection timeout")),
-    ])
+    bot.stream_chat = MagicMock(
+        return_value=[
+            ErrorEvent(error=RuntimeError("Connection timeout")),
+        ]
+    )
 
     stream_turn(bot, "hi", test_console)
     output = test_console.export_text()

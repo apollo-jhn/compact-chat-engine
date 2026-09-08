@@ -29,7 +29,8 @@ class TokenizerManager:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 with redirect_stderr(f_err), redirect_stdout(f_out):
-                    from transformers import AutoTokenizer, logging as hf_logging
+                    from transformers import AutoTokenizer
+                    from transformers import logging as hf_logging
 
                     hf_logging.set_verbosity_error()
 

@@ -235,6 +235,44 @@ If you are using a standard virtual environment with `pip`, run:
 pytest
 ```
 
+## Code Style and Formatting
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for fast linting and code formatting, alongside [pre-commit](https://pre-commit.com/) to automatically enforce standards before every commit.
+
+### Formatting and Linting
+
+Format the entire codebase:
+
+```bash
+uv run ruff format .
+```
+
+Check code for style and lint errors (with auto-fix):
+
+```bash
+uv run ruff check --fix .
+```
+
+Verify formatting without modifying files (e.g., in CI):
+
+```bash
+uv run ruff format --check .
+```
+
+### Git Pre-Commit Hooks
+
+Pre-commit hooks are configured in `.pre-commit-config.yaml`. Install the hook into your local `.git` folder with:
+
+```bash
+uv run pre-commit install
+```
+
+Run hooks against all files manually:
+
+```bash
+uv run pre-commit run --all-files
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
