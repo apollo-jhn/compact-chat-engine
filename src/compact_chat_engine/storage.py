@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 import time
-from typing import Optional
+from typing import Any, Optional
 
 from .models import Message, SessionState
 
@@ -206,6 +206,33 @@ class SqliteSessionStorage:
                 "SELECT session_id FROM sessions ORDER BY updated_at DESC"
             ).fetchall()
             return [row["session_id"] for row in rows]
+
+    def list_sessions_detailed(self) -> list[dict[str, Any]]:
+        with self._get_connection() as conn:
+            query = """
+                SELECT 
+                    s.session_id,
+                    s.scratchpad,
+                    s.updated_at,
+                    SUM(CASE WHEN m.is_archived = 0 THEN 1 ELSE 0 END) as active_count,
+                    SUM(CASE WHEN m.is_archived = 1 THEN 1 ELSE 0 END) as archived_count
+                FROM sessions s
+                LEFT JOIN messages m ON s.session_id = m.session_id
+                GROUP BY s.session_id
+                ORDER BY s.updated_at DESC
+            """
+            rows = conn.execute(query).fetchall()
+            results: list[dict[str, Any]] = []
+            for r in rows:
+                scratchpad_val = r["scratchpad"] or ""
+                results.append({
+                    "session_id": r["session_id"],
+                    "has_scratchpad": bool(scratchpad_val.strip()),
+                    "updated_at": r["updated_at"],
+                    "active_count": r["active_count"] or 0,
+                    "archived_count": r["archived_count"] or 0,
+                })
+            return results
 
     def delete_session(self, session_id: str) -> None:
         with self._get_connection() as conn:
