@@ -1,5 +1,7 @@
 # Compact Chat Engine
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Compact Chat Engine is a Python library and command line tool for long AI conversations. When a conversation has many messages, large language models can run out of context space. This engine solves that problem. It automatically summarizes older messages into a compact working memory scratchpad and keeps recent messages intact. It also stores your chat sessions in a local SQLite database and monitors token usage carefully.
 
 ## Features
@@ -232,3 +234,7 @@ If you are using a standard virtual environment with `pip`, run:
 ```bash
 pytest
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
