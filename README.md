@@ -134,9 +134,19 @@ python main.py
 
 ### CLI Features
 
-- Custom Sessions: When the program starts, enter a name to load an existing session or start a new one. Press Enter to use the default session.
-- Safe Interrupts: Press `Ctrl+C` while the model is typing to stop generation safely without losing your session.
-- Exit: Type `exit` or `quit` to save your session and exit the program.
+- **Rich Terminal Interface**: Formatted welcome banner, stored session table, active status cards, live token streaming, and Markdown panels with syntax highlighting.
+- **Compaction Status**: Live animated spinners when historical turns are being merged and synthesized into the working memory scratchpad.
+- **Custom Sessions & Switching**: Select a session at startup or use `/switch <name>` to change sessions on the fly without exiting.
+- **In-Chat Slash Commands**:
+  - `/help`: Show the interactive command cheat sheet.
+  - `/scratchpad`: View the current synthesized memory scratchpad in Markdown.
+  - `/tokens`: Display live token metrics, safety buffer, and context headroom breakdown.
+  - `/archive`: View turn distribution between the active buffer and the SQLite archive.
+  - `/sessions`: List all stored SQLite sessions with metrics.
+  - `/switch <name>`: Switch to an existing session or start a new one.
+  - `/clear`: Clear active buffer turns for the current session.
+  - `/exit` or `/quit`: Persist session state and cleanly exit.
+- **Safe Interrupts**: Press `Ctrl+C` while the model is typing to halt output safely without losing session state.
 
 ## Python API Usage
 

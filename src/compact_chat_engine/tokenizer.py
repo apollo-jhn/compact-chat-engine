@@ -18,13 +18,31 @@ class TokenizerManager:
         self.tiktoken_enc = None
         self.backend = "heuristic"
 
-        # Tier 1: Attempt Hugging Face AutoTokenizer
+        # Tier 1: Attempt Hugging Face AutoTokenizer (cache-first, suppressed warnings)
         try:
-            from transformers import AutoTokenizer
+            import io
+            import warnings
+            from contextlib import redirect_stderr, redirect_stdout
 
-            self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                repo_id, trust_remote_code=True, local_files_only=False
-            )
+            f_err = io.StringIO()
+            f_out = io.StringIO()
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                with redirect_stderr(f_err), redirect_stdout(f_out):
+                    from transformers import AutoTokenizer, logging as hf_logging
+
+                    hf_logging.set_verbosity_error()
+
+                    # Step 1: Attempt local cache first to avoid network checks & Hub warnings
+                    try:
+                        self.hf_tokenizer = AutoTokenizer.from_pretrained(
+                            repo_id, trust_remote_code=True, local_files_only=True
+                        )
+                    except Exception:
+                        # Step 2: Attempt network download if not cached
+                        self.hf_tokenizer = AutoTokenizer.from_pretrained(
+                            repo_id, trust_remote_code=True, local_files_only=False
+                        )
             self.backend = "huggingface"
         except Exception:
             # Tier 2: Attempt tiktoken
