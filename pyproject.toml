@@ -1,0 +1,29 @@
+[project]
+name = "compact-chat-engine"
+version = "0.1.0"
+description = "Compact memory chat engine with tiered tokenization and SQLite persistence"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "openai>=3.9.0",
+    "python-dotenv>=1.2.3",
+    "tiktoken>=0.14.0",
+]
+
+[project.scripts]
+compact-chat = "compact_chat_engine.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.optional-dependencies]
+hf = [
+    "transformers>=5.16.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
